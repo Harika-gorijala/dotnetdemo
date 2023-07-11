@@ -6,11 +6,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    environment:
-      - ASPNETCORE_URLS=http://*:5000
     depends_on:
       - redis
       - mysql
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=your_database;User=root;Password=your_password
 
   redis:
     image: redis
