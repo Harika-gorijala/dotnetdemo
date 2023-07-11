@@ -8,19 +8,20 @@ RUN apt-get update && \
 COPY . ./
 RUN dotnet restore && \
     dotnet build "dotnet6.csproj" -c Release && \
-    dotnet publish "dotnet6.csproj" -c Release -o /app/publish
+    dotnet publish "dotnet6.csproj" -c Release -o publish
+
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 COPY --from=build /app/publish .
 
-ENV ASPNETCORE_URLS=http://*:5000
+ENV ASPNETCORE_URLS http://*:5000
 
-RUN groupadd -r harika && \
-    useradd -r -g harika -s /bin/false harika && \
-    chown -R harika:harika /app
+RUN groupadd -r pavani && \
+    useradd -r -g pavani -s /bin/false pavani && \
+    chown -R pavani:pavani /app
 
-USER harika
+USER pavani
 
 EXPOSE 5000
-ENTRYPOINT ["dotnet", "dotnet6.dll"]
+ENTRYPOINT ["dotnet", "dotnet6.dll"]
