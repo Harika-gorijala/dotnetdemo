@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: harikagorijaladotnetdemo 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: harikagorijaladotnetdemo
+  template:
+    metadata:
+      labels:
+        app: harikagorijaladotnetdemo 
+    spec:
+      containers:
+        - name: harikagorijaladotnetdemo 
+          image: aksh4.azurecr.io/harikagorijaladotnetdemo
+          ports:
+          - containerPort: 5000
