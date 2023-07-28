@@ -19,7 +19,7 @@ variables:
   imagePullSecret: 'aksh4db42-auth'
 
   # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+  vmImageName: 'my-pool'
 
 
 stages:
