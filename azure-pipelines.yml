@@ -49,7 +49,7 @@ stages:
     displayName: DeployToDev
     pool:
       name: $(vmImageName)
-    environment: 'PrashanthRangavajhaladotnetdemo'
+    environment: 'harikagorijaladotnetdemo'
     strategy:
       runOnce:
         deploy:
