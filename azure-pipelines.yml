@@ -9,8 +9,6 @@ resources:
 - repo: self
 
 variables:
-
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '4c4cb669-7b09-4608-998e-983a14aa2375'
   imageRepository: 'harikagorijaladotnetdemo'
   containerRegistry: 'aksh4.azurecr.io'
@@ -18,10 +16,9 @@ variables:
   tag: '$(Build.BuildId)'
   imagePullSecret: 'aksh4db42-auth'
 
-  # Agent VM image name
+
+ # Agent VM image name
   vmImageName: 'my-pool'
-
-
 stages:
 - stage: Build
   displayName: Build stage
@@ -40,3 +37,73 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+    - upload: manifests
+      artifact: manifests
+
+- stage: DeployToDev
+  displayName: DeployToDev stage
+  dependsOn: Build
+  jobs:
+  - deployment: DeployToDev
+    displayName: DeployToDev
+    pool:
+      name: $(vmImageName)
+    environment: 'PrashanthRangavajhaladotnetdemo'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              action: 'createSecret'
+              kubernetesServiceConnection: 'cluster-sddf'
+              secretType: 'dockerRegistry'
+              secretName: '$(imagePullSecret)'
+              dockerRegistryEndpoint: '$(dockerRegistryServiceConnection)'
+
+          - task: KubernetesManifest@0
+            displayName: Deploy to Kubernetes cluster
+            inputs:
+              action: 'deploy'
+              kubernetesServiceConnection: 'cluster-sddf'
+              manifests: |
+                $(Pipeline.Workspace)/manifests/deployment.yml
+                $(Pipeline.Workspace)/manifests/service.yml
+              containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+              imagePullSecrets: '$(imagePullSecret)'
+
+- stage: DeployToProd
+  displayName: DeployToProd stage
+  dependsOn: DeployToDev
+
+  jobs:
+  - deployment: DeployToProd
+    displayName: DeployToProd
+    pool:
+      name: $(vmImageName)
+    environment: 'Prod'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              action: 'createSecret'
+              kubernetesServiceConnection: 'cluster-sddf'
+              secretType: 'dockerRegistry'
+              secretName: '$(imagePullSecret)'
+              dockerRegistryEndpoint: '$(dockerRegistryServiceConnection)'
+
+          - task: KubernetesManifest@0
+            displayName: Deploy to Kubernetes cluster
+            inputs:
+              action: 'deploy'
+              kubernetesServiceConnection: 'cluster-sddf'
+              manifests: |
+                $(Pipeline.Workspace)/manifests/deployment.yml
+                $(Pipeline.Workspace)/manifests/service.yml
+              containers: '$(containerRegistry)/$(imageRepository):$(tag)'
+              imagePullSecrets: '$(imagePullSecret)'
