@@ -67,7 +67,7 @@ stages:
             displayName: Deploy to Kubernetes cluster
             inputs:
               action: 'deploy'
-              kubernetesServiceConnection: 'aks-haar'
+              kubernetesServiceConnection: 'aks4-haar'
               manifests: |
                 $(Pipeline.Workspace)/manifests/deployment.yml
                 $(Pipeline.Workspace)/manifests/service.yml
@@ -92,7 +92,7 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: 'createSecret'
-              kubernetesServiceConnection: 'cluster-sddf'
+              kubernetesServiceConnection: 'aks4-haar'
               secretType: 'dockerRegistry'
               secretName: '$(imagePullSecret)'
               dockerRegistryEndpoint: '$(dockerRegistryServiceConnection)'
@@ -101,7 +101,7 @@ stages:
             displayName: Deploy to Kubernetes cluster
             inputs:
               action: 'deploy'
-              kubernetesServiceConnection: 'cluster-sddf'
+              kubernetesServiceConnection: 'aks4-haar'
               manifests: |
                 $(Pipeline.Workspace)/manifests/deployment.yml
                 $(Pipeline.Workspace)/manifests/service.yml
